@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        X-admin v1.0
+        用户列表
     </title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -48,11 +48,12 @@
             </div>
         </form>
         <xblock>
-            <button class="layui-btn layui-btn-danger" onclick="delAll()"><i
-                    class="layui-icon">&#xe640;</i>批量删除</button>
+            <!-- <button class="layui-btn layui-btn-danger" onclick="delAll()">
+                <iclass="layui-icon">&#xe640;</i>批量删除
+            </button> -->
             <button class="layui-btn" onclick="admin_add('添加用户','/adminList/add','600','500')"><i
-                    class="layui-icon">&#xe608;</i>添加</button><span class="x-right" style="line-height:40px">共有数据：88
-                条</span>
+                    class="layui-icon">&#xe608;</i>添加</button>
+            <span class="x-right" style="line-height:40px"></span>
         </xblock>
         <table class="layui-table">
             <thead>
@@ -154,75 +155,117 @@
 
         });
 
-        //批量删除提交
-        function delAll() {
-            layer.confirm('确认要删除吗？', function (index) {
-                //捉到所有被选中的，发异步进行删除
-                layer.msg('删除成功', { icon: 1 });
-            });
-        }
+        // //批量删除提交
+        // function delAll() {
+        //     layer.confirm('确认要删除吗？', function (index) {
+        //         //捉到所有被选中的，发异步进行删除
+        //         layer.msg('删除成功', { icon: 1 });
+        //     });
+        // }
         /*添加*/
         function admin_add(title, url, w, h) {
             x_admin_show(title, url, w, h);
         }
 
-        /*停用*/
-        function admin_stop(obj, id) {
-            layer.confirm('确认要停用吗？', function (index) {
-                //发异步把用户状态进行更改
-                $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="admin_start(this,id)" href="javascript:;" title="启用"><i class="layui-icon">&#xe62f;</i></a>');
-                $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-disabled layui-btn-mini">已停用</span>');
-                $(obj).remove();
-                layer.msg('已停用!', { icon: 5, time: 1000 });
-            });
+
+        /*启用停用*/
+        var ok = true;
+        function admin_start(obj, static, name) {
+            switch (static) {
+                case '已停用':
+                    layer.confirm('确认要启用吗？', function (index) {
+                        //发异步把用户状态进行更改
+                        $.ajax({
+                            type: "post",
+                            url: "/adminList/staticstart",
+                            data: { name },
+                            success: function (str) { }
+                        });
+                        $(obj).parents("tr").find(".td-manage").prepend(`<a style="text-decoration:none" onClick="admin_start(this,'已启用','${name}')" href="javascript:;" title="停用"><i class="layui-icon">&#xe601;</i></a>`);
+                        $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-disable layui-btn-mini">已启用</span>');
+                        $(obj).remove();
+                        layer.msg('已启用!', { icon: 6, time: 1000 });
+                    });
+                    break;
+
+                case '已启用':
+                    layer.confirm('确认要停用吗？', function (index) {
+                        //发异步把用户状态进行更改
+                        $.ajax({
+                            type: "post",
+                            url: "/adminList/staticstop",
+                            data: { name },
+                            success: function (str) {
+
+                            }
+                        });
+                        $(obj).parents("tr").find(".td-manage").prepend(`<a style="text-decoration:none" onClick="admin_start(this,'已停用','${name}')" href="javascript:;" title="启用"><i class="layui-icon">&#xe62f;</i></a>`);
+                        $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-normal layui-btn-mini">已停用</span>');
+                        $(obj).remove();
+                        layer.msg('已停用!', { icon: 5, time: 1000 });
+                    });
+                    break;
+            }
+
         }
 
-        /*启用*/
-        function admin_start(obj, id) {
-            layer.confirm('确认要启用吗？', function (index) {
-                //发异步把用户状态进行更改
-                $(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="admin_stop(this,id)" href="javascript:;" title="停用"><i class="layui-icon">&#xe601;</i></a>');
-                $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span>');
-                $(obj).remove();
-                layer.msg('已启用!', { icon: 6, time: 1000 });
-            });
-        }
+
+
         //编辑
         function admin_edit(title, url, id, w, h) {
             x_admin_show(title, url, w, h);
         }
+
         /*删除*/
         function admin_del(obj, id) {
             layer.confirm('确认要删除吗？', function (index) {
                 //发异步删除数据
-                $(obj).parents("tr").remove();
-                layer.msg('已删除!', { icon: 1, time: 1000 });
+                $.ajax({
+                    type: "post",
+                    url: "/adminList/deleteadmin",
+                    data: { id },
+                    success: function (str) {
+
+                        if (str.status) {
+                            $(obj).parents("tr").remove();
+                            layer.msg('已删除!', { icon: 1, time: 1000 });
+                        } else {
+                            $(obj).parents("tr").remove();
+                            layer.msg('删除失败!', { icon: 1, time: 1000 });
+                        }
+                    }
+                });
+
             });
         }
     </script>
     <script>
+        var adminlistnum = '';
         $.ajax({
             type: "get",
             url: "/adminList/list",
             data: '{}',
             success: function (str) {
-                var tobdy = '';
+                var tobdy = '0';
+
+                adminlistnum = str.findname.length;
+                $('.x-right').html('共有数据  ' + adminlistnum + "  条");
                 tobdy += $.map(str.findname, function (item, key) {
                     return ` <tr>
                     <td><input type="checkbox" value="1" name=""></td>
-                    <td>${item._id}</td>
+                    <td>${key + 1}</td>
                     <td>${item.name}</td>
                     <td>${item.phone}</td>
                     <td>${item.email}</td>
                     <td>${item.role}</td>
                     <td>${item.time}</td>
                     <td class="td-status">
-                        <span class="layui-btn layui-btn-normal layui-btn-mini">
-                                ${static(item.static)}
+                        <span class="layui-btn layui-btn-normal layui-btn-mini" >
+                            ${item.static}
                         </span>
                     </td>
                     <td class="td-manage">
-                        <a style="text-decoration:none" onclick="admin_stop(this,'10001')" href="javascript:;"
+                        <a style="text-decoration:none"  onclick="admin_start(this,'${item.static}',${item.name})" href="javascript:;"
                             title="停用">
                             <i class="layui-icon">&#xe601;</i>
                         </a>
@@ -230,23 +273,30 @@
                             class="ml-5" style="text-decoration:none">
                             <i class="layui-icon">&#xe642;</i>
                         </a>
-                        <a title="删除" href="javascript:;" onclick="admin_del(this,'1')" style="text-decoration:none">
+                        <a title="删除" href="javascript:;" onclick="admin_del(this,'${item._id}')" style="text-decoration:none">
                             <i class="layui-icon">&#xe640;</i>
                         </a>
                     </td>
                 </tr>`;
                 }).join('');
-                $('#tobdy').html(tobdy);
+                if (tobdy) {
+                    $('#tobdy').html(tobdy);
+                } else {
+                    tobdy = "没有任何数据";
+                    $('#tobdy').html(tobdy).css({ 'text-align': 'center', 'fontSize': '40px', 'color': '#999', 'padding-left': '230px' });
+
+                }
+
             }
         });
+        // function static(obj) {
+        //     if (obj == '1') {
+        //         return '已启用';
+        //     } else {
+        //         return '已停用';
+        //     }
+        // }
 
-        function static(obj) {
-            if (obj == '1') {
-                return '已启用';
-            } else if (obj == '0') {
-                return '已停用';
-            }
-        }
     </script>
     <script>
         var _hmt = _hmt || [];

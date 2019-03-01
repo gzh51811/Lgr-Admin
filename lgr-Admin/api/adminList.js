@@ -20,13 +20,51 @@ Router.get('/add', (req, res) => {
 })
 
 
+// 停用
+Router.post('/staticstop', async (req, res) => {
+    var id = req.body.name;
+    let deletename = await mongodb.update('user', { 'name': id }, { $set: { static: '已停用' } });
+    if (deletename.upsertedCount) {
+        return 0;
+    } else {
+        return 1;
+    }
+})
+
+// 启用
+Router.post('/staticstart', async (req, res) => {
+    var id = req.body.name;
+    let deletename = await mongodb.update('user', { 'name': id }, { $set: { static: '已启用' } });
+
+    if (deletename.upsertedCount) {
+        return 1;
+    } else {
+        return 0;
+    }
+})
+
+
+// 删除当前用户信息
+Router.post('/deleteadmin', async (req, res) => {
+    var id = mongoose.Types.ObjectId(req.body.id);
+    let deletename = await mongodb.delete('user', { '_id': id });
+    // console.log(id);
+    // console.log(deletename);
+    if (deletename.deletedCount) {
+        res.send({ deletename, status: 1 });
+    } else {
+        res.send({ deletename, status: 0 });
+    }
+})
+
+
 
 // 修改时获取当前用户信息
 Router.get('/edit/:id', async (req, res) => {
     var id = mongoose.Types.ObjectId(req.params.id);
     let findname = await mongodb.find('user', { '_id': id });
 
-    console.log(findname)
+    // console.log(findname)
     if (findname.length) {
         // var data = { findname, status: 1 };
         res.render('adminEdit', {
@@ -55,8 +93,6 @@ Router.post('/edit', async (req, res) => {
     //状态 是否启用  0 不启用 ,1启用
     (async () => {
         let updateuser = await mongodb.update('user', { '_id': id }, { $set: { name, passward, phone, email, role } });
-        console.log(updateuser.result.ok);
-
         if (updateuser.result.ok) {
             res.send({ updateuser, status: 1 });
         } else {
@@ -100,7 +136,7 @@ Router.post('/add', (req, res) => {
     let role = req.body.role;  //角色
     let datetime = Date.now();
     let time = setTimes(datetime);
-    let static = "0"; //状态 是否启用  0 不启用 ,1启用
+    let static = "已启用"; //状态 是否启用  0 不启用 ,1启用
 
     (async () => {
         let findname = await mongodb.find('user', { name });

@@ -1,5 +1,6 @@
 const mongodb = require('./db');
 const express = require('express');
+const md5 = require('md5');
 const Router = express.Router();
 
 Router.get('/', (req, res) => {
@@ -9,18 +10,17 @@ Router.get('/', (req, res) => {
 // 登录查询用户是否匹配
 Router.post('/', (req, res) => {
     let name = req.body.name;
-    let passward = req.body.password;
+    let passward = md5(req.body.password);
 
     (async () => {
         let resultname = await mongodb.find('user', { name });
+        console.log(resultname);
         let result = await mongodb.find('user', { name, passward });
-        if (resultname) {
+        if (resultname == '') {
             res.send({ result, status: -1 });
-            return;
-        }
-        if (result.length) {
+        } else if (result.length == '1') {
             res.send({ result, status: 1 });
-        } else {
+        } else if (result.length == '0') {
             res.send({ result, status: 0 });
         }
 
