@@ -1,6 +1,8 @@
 const mongodb = require('./db');
 const express = require('express');
 const md5 = require('md5');
+var mongoose = require('mongoose');
+
 
 
 const Router = express.Router();
@@ -17,9 +19,51 @@ Router.get('/add', (req, res) => {
     res.render('adminAdd');
 })
 
-Router.get('/edit', (req, res) => {
-        res.render('adminEdit');
-})
+
+
+// 修改时获取当前用户信息
+Router.get('/edit/:id', async (req, res) => {
+    var id = mongoose.Types.ObjectId(req.params.id);
+    let findname = await mongodb.find('user', { '_id': id });
+
+    console.log(findname)
+    if (findname.length) {
+        // var data = { findname, status: 1 };
+        res.render('adminEdit', {
+            'id': id,
+            'name': findname[0].name,
+            'phone': findname[0].phone,
+            'email': findname[0].email,
+            'role': findname[0].role,
+            'passward': findname[0].passward,
+            'status': 1
+        });
+    } else {
+        res.render('adminEdit', { ' status': 1 });
+    }
+});
+
+// 修改当前用户信息提交
+Router.post('/edit', async (req, res) => {
+    // res.render('adminAdd');
+    let name = req.body.username;
+    let passward = md5(req.body.password);
+    let phone = req.body.phone;
+    let email = req.body.email;
+    var id = mongoose.Types.ObjectId(req.body.id);
+    let role = req.body.role;  //角色
+    //状态 是否启用  0 不启用 ,1启用
+    (async () => {
+        let updateuser = await mongodb.update('user', { '_id': id }, { $set: { name, passward, phone, email, role } });
+        console.log(updateuser.result.ok);
+
+        if (updateuser.result.ok) {
+            res.send({ updateuser, status: 1 });
+        } else {
+            res.send({ updateuser, status: 0 });
+        }
+    })();
+});
 
 // 用户列表
 Router.get('/list', async (req, res) => {
@@ -29,7 +73,6 @@ Router.get('/list', async (req, res) => {
     } else {
         res.send({ findname, status: 0 });
     }
-
 })
 
 // 查询用户名是否存在

@@ -226,7 +226,7 @@
                             title="停用">
                             <i class="layui-icon">&#xe601;</i>
                         </a>
-                        <a title="编辑" href="javascript:;" onclick="admin_edit('编辑','/adminList/edit','4','','510')"
+                        <a title="编辑" href="javascript:;" onclick="admin_edit('编辑','adminList/edit/${item._id}','4','','510')"
                             class="ml-5" style="text-decoration:none">
                             <i class="layui-icon">&#xe642;</i>
                         </a>
@@ -241,11 +241,10 @@
         });
 
         function static(obj) {
-            console.log(obj);
             if (obj == '1') {
                 return '已启用';
             } else if (obj == '0') {
-                return '未启用';
+                return '已停用';
             }
         }
     </script>
