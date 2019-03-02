@@ -7,10 +7,15 @@ const app = express();
 
 
 
+
+
 app.set('view engine', 'ejs');  //配置ejs模板引擎。ejs只需要配置，不需要引入(express中已经引入)
 app.set('views', __dirname + '/view');
 
 
+
+
+// 路由
 let Router = require('./api')
 
 app.use(express.static('./'));

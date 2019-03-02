@@ -3,21 +3,27 @@ const express = require('express');
 const Router = express.Router();
 const bodyParser = require('body-parser');
 
+
 // 路由
 const loginRouter = require('./login.js');
 const indsRouter = require('./inds.js');
 const loginoutRouter = require('./loginout.js');
 const adminListRouter = require('./adminList.js');
+const goodslist = require('./goodslist.js');
+const commodityEditor = require('./commodityEditor.js');
 
 Router.use(bodyParser.json());//数据JSON类型
 Router.use(bodyParser.urlencoded({ extended: false }));//解析post请求数据
 
 
-Router.use('/login', loginRouter); //调到登录
+
+
 Router.use('/index', indsRouter); //调到首页
 Router.use('/adminList', adminListRouter); //调到首页
 Router.use('/loginout', loginoutRouter);  //退出
-
+Router.use('/login', loginRouter); //调到登录
+Router.use('/goodslist', goodslist);  //商品列表页
+Router.use('/commodityEditor', commodityEditor);  //商品编辑
 
 
 module.exports = Router;

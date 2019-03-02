@@ -14,7 +14,6 @@ Router.post('/', (req, res) => {
 
     (async () => {
         let resultname = await mongodb.find('user', { name });
-        console.log(resultname);
         let result = await mongodb.find('user', { name, passward });
         if (resultname == '') {
             res.send({ result, status: -1 });

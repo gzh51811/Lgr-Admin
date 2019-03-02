@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        Lz-Admin
+        登录
     </title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -101,7 +101,8 @@
                             $('#errormsg').html('账号已被停用 、请联系管理员');
                         } else if (str.status == '1') {
                             location.href = '/index';
-                            document.cookie = str.result[0].name;
+                            var a = document.cookie = 'name=' + str.result[0].name;
+                            console.log(a);
                         }
                     }
                 });

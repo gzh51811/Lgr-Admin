@@ -458,6 +458,26 @@ body .site-demo-nav .layui-nav-item{line-height: 40px}
   /*.x-slide_left{display: none;}*/
   .layui-nav .x-index{display: none;}
 }
+body .td-manage{
+  width:200px;
+  text-align:center;
+}
+body .td-manage a{
+  background:#f00;
+  color:#fff;
+  display:inline-block;
+  width:40px;
+  height:26px;
+  border-radius:5px;
+  text-align:center;
+  line-height:26px;
+  text-decoration:none;
+  font-size:12px;
+}
 
-
-
+body .td-manage a i{
+  font-size:12px;
+}
+body td,body th{
+  text-align:center !important;
+}
