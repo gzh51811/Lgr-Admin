@@ -32,7 +32,7 @@
                             <!-- 二级菜单 -->
                             <dd><a href="">个人信息</a></dd>
                             <!-- <dd><a href="">切换帐号</a></dd> -->
-                            <dd><a href="/login">退出</a></dd>
+                            <dd><a href="/loginout">退出</a></dd>
                         </dl>
                     </li>
                     <!-- <li class="layui-nav-item">
@@ -91,7 +91,7 @@
                         </a>
                         <dl class="layui-nav-child">
                             <dd class="">
-                                <a href="javascript:;" _href="../category.html">
+                                <a href="javascript:;" _href="/category">
                                     <cite>分类列表</cite>
                                 </a>
                             </dd>
@@ -149,8 +149,8 @@
                 </li>
             </ul>
             <div class="layui-tab-content site-demo site-demo-body">
-                <div class="layui-tab-item layui-show">
-                    <iframe frameborder="0" src="../index/welcome" class="x-iframe" style="height:550px"></iframe>
+                <div class="layui-tab-item layui-show" style="min-height:550px">
+                    <iframe frameborder="0" src="../index/welcome" class="x-iframe"></iframe>
                 </div>
             </div>
         </div>
@@ -172,35 +172,28 @@
     </script>
     <script>
 
-        var cookie = {
-            get: function (key) {
-                //获取
-                var str = document.cookie; //name=jingjing; psw=123456
-                var arr = str.split('; '); //[name=jingjing , psw=123456]
-                for (var i = 0; i < arr.length; i++) {
-                    var arr2 = arr[i].split('='); //[name,jingjing] [psw,123456]
-                    if (key == arr2[0]) {
-                        return arr2[1]; //通过键名取键值
-                    }
-                }
-            }
-        }
+        let token = sessionStorage.getItem('token');
+        let name = sessionStorage.getItem('name');
+        let id = sessionStorage.getItem('id');
+        if (!token) {
+            location.href = '/login';
+        } else {
 
-        $.ajax({
-            type: "post",
-            url: "/index",
-            data: { name: cookie.get('name') },
-            success: function (str) {
-                $('.uname').html(str.findname[0].name);
-                if (str.status) {
-                    console.log(str.findname[0].role);
-                    if ((str.findname[0].role) == "超级管理员") {
-                        $('.superadmin').css('display', 'block');
+            $.ajax({
+                type: "post",
+                url: "/index",
+                data: { name },
+                success: function (str) {
+                    $('.uname').html(str.findname[0].name);
+                    if (str.status) {
+                        console.log(str.findname[0].role);
+                        if ((str.findname[0].role) == "超级管理员") {
+                            $('.superadmin').css('display', 'block');
+                        }
                     }
                 }
-            }
-        });
-        console.log(cookie.get('name'));
+            });
+        }
     </script>
 </body>
 

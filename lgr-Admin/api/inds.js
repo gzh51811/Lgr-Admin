@@ -1,10 +1,24 @@
 const mongodb = require('./db');
 const express = require('express');
+const token = require('./token');
 const Router = express.Router();
+
+
+// 验证登录
+Router.post('/token', (req, res, next) => {
+    let tokenverify = token.verify(req.body.token);
+    if (!tokenverify) {
+        res.send({ msg: 0 });
+    } else {
+        res.send({ msg: 1, result: tokenverify });
+        next();
+    }
+})
 
 Router.get('/', (req, res) => {
     res.render('index');
 })
+
 
 Router.get('/welcome', (req, res) => {
     res.render('welcome');

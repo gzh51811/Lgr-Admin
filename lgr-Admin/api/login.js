@@ -1,6 +1,7 @@
 const mongodb = require('./db');
 const express = require('express');
 const md5 = require('md5');
+const token = require('./token');
 const Router = express.Router();
 
 Router.get('/', (req, res) => {
@@ -17,10 +18,11 @@ Router.post('/', (req, res) => {
         let result = await mongodb.find('user', { name, passward });
         if (resultname == '') {
             res.send({ result, status: -1 });
-        } else if (result.length == '1') {
-            res.send({ result, status: 1 });
         } else if (result.length == '0') {
             res.send({ result, status: 0 });
+        } else if (result.length == '1') {
+            let _token = token.create(name, '10000');
+            res.send({ result, status: 1, token: _token });
         }
 
     })()

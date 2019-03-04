@@ -181,7 +181,7 @@
                             data: { name },
                             success: function (str) { }
                         });
-                        $(obj).parents("tr").find(".td-manage").prepend(`<a style="text-decoration:none" onClick="admin_start(this,'已启用','${name}')" href="javascript:;" title="停用"><i class="layui-icon">&#xe601;</i></a>`);
+                        $(obj).parents("tr").find(".td-manage").prepend(`<a style="text-decoration:none;background-color: #4394ff" onClick="admin_start(this,'已启用','${name}')" href="javascript:;" title="停用"><i class="layui-icon">&#xe601;</i></a>`);
                         $(obj).parents("tr").find(".td-status").html('<span class="layui-btn layui-btn-disable layui-btn-mini">已启用</span>');
                         $(obj).remove();
                         layer.msg('已启用!', { icon: 6, time: 1000 });
@@ -265,16 +265,16 @@
                         </span>
                     </td>
                     <td class="td-manage">
-                        <a style="text-decoration:none"  onclick="admin_start(this,'${item.static}',${item.name})" href="javascript:;"
+                        <a style="text-decoration:none;background-color:#4394ff"  onclick="admin_start(this,'${item.static}',${item.name})" href="javascript:;"
                             title="停用">
                             <i class="layui-icon">&#xe601;</i>
                         </a>
                         <a title="编辑" href="javascript:;" onclick="admin_edit('编辑','adminList/edit/${item._id}','4','','510')"
-                            class="ml-5" style="text-decoration:none">
-                            <i class="layui-icon">&#xe642;</i>
+                            class="ml-5" style="text-decoration:none;background-color:#009688">
+                            <i class="layui-icon">编辑</i>
                         </a>
                         <a title="删除" href="javascript:;" onclick="admin_del(this,'${item._id}')" style="text-decoration:none">
-                            <i class="layui-icon">&#xe640;</i>
+                            <i class="layui-icon">删除</i>
                         </a>
                     </td>
                 </tr>`;
