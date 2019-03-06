@@ -61,13 +61,7 @@
                             </dd>
                             </dd>
 
-                            <dd class="">
-                            <dd class="">
-                                <a href="javascript:;" _href="../category.html">
-                                    <cite>产品分类</cite>
-                                </a>
-                            </dd>
-                            </dd>
+
                         </dl>
                     </li>
 
@@ -178,6 +172,20 @@
         if (!token) {
             location.href = '/login';
         } else {
+            $.ajax({
+                type: "post",
+                url: "/index/token",
+                data: {
+                    token: token,
+                    name: name,
+                    id: id
+                },
+                success: function (str) {
+                    if (str.msg == '0') {
+                        location.href = '/login';
+                    }
+                }
+            });
 
             $.ajax({
                 type: "post",
@@ -186,7 +194,7 @@
                 success: function (str) {
                     $('.uname').html(str.findname[0].name);
                     if (str.status) {
-                        console.log(str.findname[0].role);
+                        // console.log(str.findname[0].role);
                         if ((str.findname[0].role) == "超级管理员") {
                             $('.superadmin').css('display', 'block');
                         }
@@ -194,6 +202,9 @@
                 }
             });
         }
+
+
+
     </script>
 </body>
 

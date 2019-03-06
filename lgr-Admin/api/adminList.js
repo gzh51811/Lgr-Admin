@@ -1,7 +1,7 @@
 const mongodb = require('./db');
 const express = require('express');
 const md5 = require('md5');
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 
 

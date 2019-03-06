@@ -5,7 +5,7 @@ const token = require('./token');
 const Router = express.Router();
 
 Router.get('/', (req, res) => {
-    res.render('login');
+    res.render('login', { loginout: 0 });
 })
 
 // 登录查询用户是否匹配

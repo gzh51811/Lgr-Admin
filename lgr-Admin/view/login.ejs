@@ -73,13 +73,14 @@
 
 
         var loginout = ('<%-loginout %>') ? ('<%-loginout %>') : 0;
-
+        // 退出
         if (loginout == 1) {
             sessionStorage.removeItem('token');
             sessionStorage.removeItem('name');
             sessionStorage.removeItem('id');
         }
 
+        // 登录
         $('.loginbtn').click(function (e) {
             e.preventDefault();
             var name = $('#username').val();
@@ -123,7 +124,7 @@
                                     id: str.result[0]._id
                                 },
                                 success: function (str) {
-                                    if (str.msg = 0) {
+                                    if (str.msg == 0) {
                                         location.href = '/login';
                                     } else {
                                         location.href = '/index';

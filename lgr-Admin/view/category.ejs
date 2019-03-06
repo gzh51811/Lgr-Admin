@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <title>
-        X-admin v1.0
+
     </title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -13,6 +13,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
     <link rel="stylesheet" href="../css/x-admin.css" media="all">
+
 </head>
 
 <body>
@@ -29,21 +30,16 @@
     <div class="x-body">
         <form class="layui-form x-center" action="" style="width:50%">
             <div class="layui-form-pane" style="margin-top: 15px;">
-                <div class="layui-form-item">
+                <div class="layui-form-item" id="opt">
                     <label class="layui-form-label" style="width:60px">所属分类</label>
                     <div class="layui-input-inline" style="width:120px;text-align: left">
-                        <select name="fid">
+                        <select style="overflow:auto;display:block;width: 120px;height: auto"
+                            class='fenleiname layui-form-label'>
                             <option value="0">顶级分类</option>
-                            <option value="新闻">新闻</option>
-                            <option value="新闻子类1">--新闻子类1</option>
-                            <option value="新闻子类2">--新闻子类2</option>
-                            <option value="产品">产品</option>
-                            <option value="产品子类1">--产品子类1</option>
-                            <option value="产品子类2">--产品子类2</option>
                         </select>
                     </div>
                     <div class="layui-input-inline" style="width:120px">
-                        <input type="text" name="name" placeholder="分类名" autocomplete="off" class="layui-input">
+                        <input type="text" name="name" placeholder="名称" autocomplete="off" class="layui-input fname">
                     </div>
                     <div class="layui-input-inline" style="width:80px">
                         <button class="layui-btn" lay-submit="" lay-filter="add"><i
@@ -53,26 +49,26 @@
             </div>
         </form>
         <xblock><button class="layui-btn layui-btn-danger" onclick="delAll()"><i
-                    class="layui-icon">&#xe640;</i>批量删除</button><span class="x-right" style="line-height:40px">共有数据：88
-                条</span></xblock>
+                    class="layui-icon">&#xe640;</i>批量删除</button><span class="x-right" style="line-height:40px"></span>
+        </xblock>
         <table class="layui-table">
             <thead>
                 <tr>
                     <th><input type="checkbox" name="" value=""></th>
                     <th>ID</th>
-                    <th>排序</th>
-                    <th>分类名</th>
+                    <th>所属分类</th>
+                    <th>名称</th>
                     <th>操作</th>
                 </tr>
             </thead>
             <tbody id="x-link">
-                <tr>
+                <!-- <tr>
                     <td><input type="checkbox" value="1" name=""></td>
                     <td>1</td>
-                    <td>1</td>
-                    <td>新闻</td>
+                    <td>手机</td>
+                    <td>oppo</td>
                     <td class="td-manage">
-                        <a title="编辑" href="javascript:;" onclick="cate_edit('编辑','/cateEdit','4','','510')"
+                        <a title="编辑" href="javascript:;" onclick="cate_edit('编辑','/category/cateEdit','4','','510')"
                             class="ml-5" style="text-decoration:none">
                             <i class="layui-icon">&#xe642;</i>
                         </a>
@@ -80,29 +76,135 @@
                             <i class="layui-icon">&#xe640;</i>
                         </a>
                     </td>
-                </tr>
+                </tr> -->
             </tbody>
         </table>
     </div>
     <script src="../lib/layui/layui.js" charset="utf-8"></script>
     <script src="../js/x-layui.js" charset="utf-8"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
     <script>
+
+        // 所属分类请求数据
+        var _select = $('.fenleiname').html();
+        $.ajax({
+            type: "post",
+            url: "/category/cate",
+            success: function (res) {
+                _select += $.map(res, function (item, key) {
+                    return `
+                        <option value="${item.name}" id='${item._id}'>${item.name}</option>
+                        ${cate(item.cate)}`;
+                }).join('');
+                $('.fenleiname').html(_select);
+            }
+        });
+        function cate(obj) {
+            return $.map(obj, function (item, key) {
+                return `<option value="${item.name}" id='${item._id}'>一${item.name}</option>`;
+            });
+        }
+
+
+        // 获取分类列表
+        var catelist = '';
+        $.ajax({
+            type: "post",
+            url: "/category/catelist",
+            success: function (res) {
+                let arrs = [];
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].classname != '0') {
+                        arrs.push(res[i]);
+                    }
+                }
+                for (var i = 0; i < arrs.length; i++) {
+                    for (var j = 0; j < res.length; j++) {
+                        if (arrs[i].classname == res[j]._id) {
+                            arrs[i]['cate'] = res[j];
+                        }
+                    }
+                }
+
+                $('.x-right').html('共有  ' + arrs.length + '   数据');
+                catelist += $.map(arrs, function (item, key) {
+                    return `
+                    <tr>
+                    <td><input type="checkbox" value="1" name=""></td>
+                    <td>${key}</td>
+                    <td>${item.cate.name}</td>
+                    <td>${item.name}</td>
+                    <td class="td-manage">
+                        <a title="编辑" href="javascript:;" onclick="cate_edit('编辑','/category/cateupdate/${item._id}','','','510')"
+                            class="ml-5" style="text-decoration:none">
+                            <i class="layui-icon">&#xe642;</i>
+                        </a>
+                        <a title="删除" href="javascript:;" onclick="cate_del(this,'${item._id}')" style="text-decoration:none">
+                            <i class="layui-icon">&#xe640;</i>
+                        </a>
+                        
+                    </td>
+                    </tr>`;
+                }).join('');
+                $('#x-link').html(catelist);
+            }
+        });
+
+
+
         layui.use(['element', 'layer', 'form'], function () {
             $ = layui.jquery;//jquery
             lement = layui.element();//面包导航
             layer = layui.layer;//弹出层
             form = layui.form();
+            // 获取所属分类
+            var classname = '0';
+            $('.fenleiname').change(function () {
+                classname = $(this).children('option:selected').attr('id');
+            });
 
             //监听提交
             form.on('submit(add)', function (data) {
-                console.log(data);
+                // console.log(data);
+                // 监听提交
+
+                if ($('.fname').val() == '') {
+                    layer.alert("名称不能为空", { icon: 5 });
+                }
                 //发异步，把数据提交给php
-                layer.alert("增加成功", { icon: 6 });
-                $('#x-link').prepend('<tr><td><input type="checkbox"value="1"name=""></td><td>1</td><td>1</td><td>' + data.field.name + '</td><td class="td-manage"><a title="编辑"href="javascript:;"onclick="cate_edit(\'编辑\',\'cate-edit.html\',\'4\',\'\',\'510\')"class="ml-5"style="text-decoration:none"><i class="layui-icon">&#xe642;</i></a><a title="删除"href="javascript:;"onclick="cate_del(this,\'1\')"style="text-decoration:none"><i class="layui-icon">&#xe640;</i></a></td></tr>');
+                $.ajax({
+                    type: "post",
+                    url: "/category/fenleiname",
+                    data: { name: $('.fname').val(), classname: classname },
+                    success: function (str) {
+                        // console.log(str);
+                        if (str) {
+                            layer.alert("增加成功", { icon: 6 });
+                            $('#x-link').prepend(`
+                            <tr>
+                                <td>
+                                    <input type="checkbox"value="1"name="">
+                                </td>
+                                <td>1</td>
+                                <td>${str.finds[0].name}</td>
+                                <td>${data.field.name}</td>
+                                <td class="td-manage">
+                                    <a title="编辑" href="javascript:;" onclick="cate_edit('编辑','/category/cateupdate/${str.finds[0]._id}','','','510')"
+                                        class="ml-5" style="text-decoration:none;background-color:#009688">
+                                        <i class="layui-icon">编辑</i>
+                                    </a>
+                                    <a title="删除" href="javascript:;" onclick="admin_del(this,'${str.finds[0]._id}')" style="text-decoration:none">
+                                        <i class="layui-icon">删除</i>
+                                    </a>
+                                    `);
+                        }
+
+
+                    }
+                });
                 return false;
             });
-
-
         })
 
 
@@ -118,13 +220,33 @@
 
         //-编辑
         function cate_edit(title, url, id, w, h) {
+            // $.ajax({
+            //     type: "get",
+            //     url: '/category/cateupdate',
+            //     data: { id },
+
+            //     success: function (res) {
+            //     }
+            // });
             x_admin_show(title, url, w, h);
+
         }
 
         /*-删除*/
         function cate_del(obj, id) {
             layer.confirm('确认要删除吗？', function (index) {
                 //发异步删除数据
+                $.ajax({
+                    type: "post",
+                    url: '/category/catedelete',
+                    data: { id },
+
+                    success: function (res) {
+                        console.log(res);
+                    }
+                });
+
+
                 $(obj).parents("tr").remove();
                 layer.msg('已删除!', { icon: 1, time: 1000 });
             });

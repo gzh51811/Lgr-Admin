@@ -13,6 +13,7 @@ Router.post('/token', (req, res, next) => {
         res.send({ msg: 1, result: tokenverify });
         next();
     }
+    // console.log(tokenverify);
 })
 
 Router.get('/', (req, res) => {
